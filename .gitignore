@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+*.test
+*.out
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+bin/
+tmp/
+
+# Database
+*.db
+*.sqlite
+
+# Docker
+*.pid
+
+# Temporary files
+*.tmp
+.cache/
