@@ -31,6 +31,6 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/api/v1/tasks/${id}`,
     UPDATE: (id: string) => `/api/v1/tasks/${id}`,
     DELETE: (id: string) => `/api/v1/tasks/${id}`,
-    BY_BOARD: (boardId: string) => `/api/v1/tasks/board/${boardId}`,
+    BY_BOARD: (boardId: string) => `/api/v1/boards/${boardId}/tasks`,
   },
 }

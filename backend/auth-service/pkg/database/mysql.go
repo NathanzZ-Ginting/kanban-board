@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/config"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/internal/domain"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/config"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/internal/domain"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

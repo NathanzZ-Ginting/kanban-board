@@ -3,20 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/config"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/internal/handler"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/internal/middleware"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/internal/repository"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/internal/service"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/pkg/database"
-	"github.com/yourusername/kanban-monorepo/backend/auth-service/pkg/logger"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/config"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/internal/handler"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/internal/middleware"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/internal/repository"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/internal/service"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/pkg/database"
+	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/auth-service/pkg/logger"
 
 	"github.com/gorilla/mux"
 )
@@ -63,10 +62,10 @@ func main() {
 
 	// Auth routes
 	authRoutes := api.PathPrefix("/auth").Subrouter()
-	authRoutes.HandleFunc("/register", authHandler.Register).Methods("POST")
-	authRoutes.HandleFunc("/login", authHandler.Login).Methods("POST")
-	authRoutes.HandleFunc("/refresh", authHandler.RefreshToken).Methods("POST")
-	authRoutes.HandleFunc("/logout", authHandler.Logout).Methods("POST")
+	authRoutes.HandleFunc("/register", authHandler.Register).Methods("POST", "OPTIONS")
+	authRoutes.HandleFunc("/login", authHandler.Login).Methods("POST", "OPTIONS")
+	authRoutes.HandleFunc("/refresh", authHandler.RefreshToken).Methods("POST", "OPTIONS")
+	authRoutes.HandleFunc("/logout", authHandler.Logout).Methods("POST", "OPTIONS")
 
 	// Health check
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

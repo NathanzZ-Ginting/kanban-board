@@ -7,8 +7,8 @@ interface TaskState {
   addTask: (task: Task) => void
   updateTask: (id: string, task: Partial<Task>) => void
   deleteTask: (id: string) => void
-  getTasksByBoard: (boardId: string) => Task[]
-  getTasksByStatus: (status: Task['status']) => Task[]
+  getTasksByColumn: (columnId: number) => Task[]
+  getTasksByBoard: (boardId: number) => Task[]
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
@@ -21,10 +21,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     })),
   deleteTask: (id) =>
     set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
+  getTasksByColumn: (columnId) => {
+    return get().tasks.filter((t) => t.columnId === columnId)
+  },
   getTasksByBoard: (boardId) => {
     return get().tasks.filter((t) => t.boardId === boardId)
-  },
-  getTasksByStatus: (status) => {
-    return get().tasks.filter((t) => t.status === status)
   },
 }))
