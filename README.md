@@ -1,6 +1,8 @@
-# Kanban Board - Monorepo
+# 🎯 Kanban Board - Monorepo
 
 Modern Kanban Board application built with Next.js (Frontend) and Golang Microservices (Backend).
+
+> **� Cara run aplikasi: [RUN.md](./RUN.md)**
 
 ## Tech Stack
 
@@ -20,8 +22,35 @@ Modern Kanban Board application built with Next.js (Frontend) and Golang Microse
 - **API**: REST API with JSON
 
 ### Infrastructure
-- **Container**: Docker + Docker Compose
-- **Database**: MongoDB 7.0+
+- **Database**: MySQL 8.0+
+- **Cache**: Redis 7+
+
+## 🚀 Quick Start
+
+### Manual Setup
+```bash
+# Clone repository
+git clone https://github.com/NathanzZ-Ginting/kanban-board.git
+cd kanban-monorepo
+
+# Setup services
+chmod +x start.sh
+./start.sh
+```
+
+See complete guide at [SETUP_GUIDE.md](./SETUP_GUIDE.md)
+
+### Access Application
+- **Frontend**: http://localhost:3000
+- **Auth Service**: http://localhost:8001
+- **User Service**: http://localhost:8002
+- **Board Service**: http://localhost:8003
+- **Task Service**: http://localhost:8004
+
+## 📚 Documentation
+- **Setup Guide**: [SETUP_GUIDE.md](./SETUP_GUIDE.md) - Panduan lengkap setup & running
+- **API Documentation**: Coming soon
+- **Architecture**: Coming soon
 
 ## Project Structure
 
@@ -33,58 +62,52 @@ kanban-monorepo/
 │   ├── user-service/
 │   ├── board-service/
 │   └── task-service/
-├── docker/                   # Docker configurations
 ├── docs/                     # Documentation
 └── scripts/                  # Utility scripts
 ```
+
+## 🔧 Commands Cheatsheet
+
+```bash
+# Development
+cd frontend && npm run dev        # Run frontend
+cd backend/auth-service && go run cmd/main.go  # Run auth service
+
+# Database
+mysql -u kanban_user -p  # Access MySQL
+```
+
+Untuk command lengkap, lihat [SETUP_GUIDE.md](./SETUP_GUIDE.md)
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
 - Go 1.21+
-- Docker & Docker Compose
-- MongoDB 7.0+
+- MySQL 8.0+
 
-### Development
+### Quick Start
 
-1. **Clone repository**
-```bash
-git clone <repo-url>
-cd kanban-monorepo
-```
-
-2. **Setup environment variables**
-```bash
-cp .env.example .env
-```
-
-3. **Run with Docker Compose**
-```bash
-docker-compose up -d
-```
-
-4. **Run locally**
-
-Frontend:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Backend (each service):
-```bash
-cd backend/auth-service
-go mod download
-go run cmd/main.go
-```
+Ikuti langkah di [SETUP_GUIDE.md](./SETUP_GUIDE.md) untuk:
+- ✅ Setup manual
+- ✅ Environment variables
+- ✅ Troubleshooting
+- ✅ API endpoints
 
 ## Environment Variables
 
-See `.env.example` for required environment variables.
+Buat file `.env` di root directory. Lihat detail lengkap di [SETUP_GUIDE.md](./SETUP_GUIDE.md#environment-variables)
 
-## Architecture
+```env
+JWT_SECRET=your-secret-key
+JWT_EXPIRY=24h
+MYSQL_HOST=mysql
+MYSQL_USER=kanban_user
+MYSQL_PASSWORD=kanban_pass
+MYSQL_DATABASE=kanban_db
+```
+
+## 🏗️ Architecture
 
 ### Backend Services
 - **Auth Service** (Port 8001): Authentication & authorization
@@ -94,7 +117,16 @@ See `.env.example` for required environment variables.
 
 ### API Documentation
 - Swagger UI available at: `http://localhost:8080/swagger`
+- Detail API endpoints di [SETUP_GUIDE.md](./SETUP_GUIDE.md#api-endpoints)
 
-## License
+## 🤝 Contributing
 
-MIT
+Contributions are welcome! Please read our contributing guidelines.
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+---
+
+Made with ❤️ by Nathan Ginting

@@ -50,9 +50,6 @@ tmp/
 *.db
 *.sqlite
 
-# Docker
-*.pid
-
 # Temporary files
 *.tmp
 .cache/

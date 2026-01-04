@@ -33,6 +33,7 @@ func LoggingMiddleware(log *logger.Logger) func(http.Handler) http.Handler {
 				"method", r.Method,
 				"path", r.URL.Path,
 				"status", wrapped.statusCode,
+				
 				"duration", time.Since(start).String(),
 				"remote_addr", r.RemoteAddr,
 			)
