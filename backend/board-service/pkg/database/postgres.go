@@ -9,22 +9,22 @@ import (
 	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/board-service/config"
 	"github.com/NathanzZ-Ginting/kanban-monorepo/backend/board-service/internal/domain"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-type MySQLDatabase struct {
+type PostgresDatabase struct {
 	DB *gorm.DB
 }
 
-func NewMySQLDatabase(cfg *config.Config) (*MySQLDatabase, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		cfg.MySQLUser,
-		cfg.MySQLPassword,
-		cfg.MySQLHost,
-		cfg.MySQLPort,
-		cfg.MySQLDatabase,
+func NewPostgresDatabase(cfg *config.Config) (*PostgresDatabase, error) {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
+		cfg.DBHost,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBName,
+		cfg.DBPort,
 	)
 
 	var gormLogger logger.Interface
@@ -42,11 +42,13 @@ func NewMySQLDatabase(cfg *config.Config) (*MySQLDatabase, error) {
 		gormLogger = logger.Default.LogMode(logger.Silent)
 	}
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: gormLogger,
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger:                 gormLogger,
+		PrepareStmt:            false, // Disable prepared statement to avoid Supabase connection pooling issues
+		SkipDefaultTransaction: true,  // Improve performance
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to MySQL: %w", err)
+		return nil, fmt.Errorf("failed to connect to Supabase PostgreSQL: %w", err)
 	}
 
 	sqlDB, err := db.DB()
@@ -58,25 +60,28 @@ func NewMySQLDatabase(cfg *config.Config) (*MySQLDatabase, error) {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	return &MySQLDatabase{DB: db}, nil
+	return &PostgresDatabase{DB: db}, nil
 }
 
-func (m *MySQLDatabase) AutoMigrate() error {
-	return m.DB.AutoMigrate(
+func (p *PostgresDatabase) AutoMigrate() error {
+	// Use a new session without prepared statements for migration
+	return p.DB.Session(&gorm.Session{
+		PrepareStmt: false,
+	}).AutoMigrate(
 		&domain.Board{},
 		&domain.Column{},
 		&domain.BoardMember{},
 	)
 }
 
-func (m *MySQLDatabase) Close() error {
-	sqlDB, err := m.DB.DB()
+func (p *PostgresDatabase) Close() error {
+	sqlDB, err := p.DB.DB()
 	if err != nil {
 		return err
 	}
 	return sqlDB.Close()
 }
 
-func (m *MySQLDatabase) GetDB() *gorm.DB {
-	return m.DB
+func (p *PostgresDatabase) GetDB() *gorm.DB {
+	return p.DB
 }

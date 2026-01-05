@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -11,18 +12,21 @@ type Config struct {
 	Port          string
 	Host          string
 	Environment   string
-	MySQLHost     string
-	MySQLPort     string
-	MySQLUser     string
-	MySQLPassword string
-	MySQLDatabase string
+	DBHost        string
+	DBPort        string
+	DBUser        string
+	DBPassword    string
+	DBName        string
 	JWTSecret     string
 	JWTExpiry     time.Duration
 	RefreshExpiry time.Duration
 }
 
 func LoadConfig() *Config {
+	// Try to load .env from current dir, then parent dirs
 	godotenv.Load()
+	godotenv.Load("../../.env")
+	godotenv.Load(filepath.Join("..", "..", ".env"))
 
 	jwtExpiry, _ := time.ParseDuration(getEnv("JWT_EXPIRY", "24h"))
 	refreshExpiry, _ := time.ParseDuration(getEnv("REFRESH_TOKEN_EXPIRY", "168h"))
@@ -31,11 +35,11 @@ func LoadConfig() *Config {
 		Port:          getEnv("AUTH_SERVICE_PORT", "8001"),
 		Host:          getEnv("AUTH_SERVICE_HOST", "0.0.0.0"),
 		Environment:   getEnv("GO_ENV", "development"),
-		MySQLHost:     getEnv("MYSQL_HOST", "localhost"),
-		MySQLPort:     getEnv("MYSQL_PORT", "3306"),
-		MySQLUser:     getEnv("MYSQL_USER", "root"),
-		MySQLPassword: getEnv("MYSQL_PASSWORD", ""),
-		MySQLDatabase: getEnv("MYSQL_DATABASE", "kanban_db"),
+		DBHost:        getEnv("SUPABASE_DB_HOST", ""),
+		DBPort:        getEnv("SUPABASE_DB_PORT", "5432"),
+		DBUser:        getEnv("SUPABASE_DB_USER", "postgres"),
+		DBPassword:    getEnv("SUPABASE_DB_PASSWORD", ""),
+		DBName:        getEnv("SUPABASE_DB_NAME", "postgres"),
 		JWTSecret:     getEnv("JWT_SECRET", "secret"),
 		JWTExpiry:     jwtExpiry,
 		RefreshExpiry: refreshExpiry,

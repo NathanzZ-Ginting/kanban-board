@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -27,8 +28,8 @@ func main() {
 	// Initialize logger
 	log := logger.NewLogger(cfg.Environment)
 
-	// Initialize MySQL database
-	db, err := database.NewMySQLDatabase(cfg)
+	// Initialize Supabase PostgreSQL database
+	db, err := database.NewPostgresDatabase(cfg)
 	if err != nil {
 		log.Fatal("Failed to connect to database", "error", err)
 	}
@@ -36,10 +37,14 @@ func main() {
 
 	// Run database migrations
 	if err := db.AutoMigrate(); err != nil {
-		log.Fatal("Failed to run database migrations", "error", err)
+		// Check if error is "relation already exists" which is not critical
+		if !strings.Contains(err.Error(), "already exists") {
+			log.Fatal("Failed to run database migrations", "error", err)
+		}
+		log.Warn("Database tables already exist, skipping migration", "error", err)
 	}
 
-	log.Info("Connected to MySQL and migrations completed")
+	log.Info("Connected to Supabase PostgreSQL and migrations completed")
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.GetDB())
@@ -71,7 +76,7 @@ func main() {
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"healthy","database":"mysql"}`))
+		w.Write([]byte(`{"status":"healthy","database":"supabase-postgresql"}`))
 	}).Methods("GET")
 
 	// Server configuration

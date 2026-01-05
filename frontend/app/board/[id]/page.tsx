@@ -73,8 +73,12 @@ export default function BoardPage({ params }: BoardPageProps) {
         setIsLoading(true);
         setError(null);
         
+        console.log('Fetching board:', params.id);
+        
         // Fetch board details (includes columns)
         const boardData = await boardService.getBoard(params.id);
+        console.log('Board data received:', boardData);
+        
         if (boardData) {
           setCurrentBoard(boardData);
           // Sort columns by position
@@ -82,6 +86,7 @@ export default function BoardPage({ params }: BoardPageProps) {
             (a, b) => a.position - b.position
           );
           setColumns(sortedColumns);
+          console.log('Columns set:', sortedColumns);
           
           // Set default selected column for task creation
           if (sortedColumns.length > 0 && !selectedColumnId) {
@@ -90,20 +95,37 @@ export default function BoardPage({ params }: BoardPageProps) {
         }
         
         // Fetch tasks for this board
+        console.log('Fetching tasks for board:', params.id);
         const tasksResponse = await taskService.getTasksByBoard(params.id);
+        console.log('Tasks response:', tasksResponse);
+        
         if (tasksResponse.tasks) {
           setTasks(tasksResponse.tasks);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to fetch data:', err);
-        setError('Failed to load board data');
+        console.error('Error details:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
+        
+        // More specific error messages
+        if (err.response?.status === 401) {
+          setError('Unauthorized. Please login again.');
+          router.push('/login');
+        } else if (err.response?.status === 404) {
+          setError('Board not found');
+        } else {
+          setError(err.response?.data?.error || 'Failed to load board data');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [isAuthenticated, params.id, setCurrentBoard, setTasks]);
+  }, [isAuthenticated, params.id, setCurrentBoard, setTasks, router]);
 
   const openCreateTaskModal = (columnId: number) => {
     setSelectedColumnId(columnId);

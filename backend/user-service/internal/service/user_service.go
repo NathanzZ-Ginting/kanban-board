@@ -37,7 +37,7 @@ func (s *userService) GetUserByID(id uint) (*dto.UserResponse, error) {
 }
 
 // get all users 
-func (s *userService) GetAllUsers(page, limit int) (*dto.UsersListRespon/se, error) {
+func (s *userService) GetAllUsers(page, limit int) (*dto.UsersListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -50,9 +50,7 @@ func (s *userService) GetAllUsers(page, limit int) (*dto.UsersListRespon/se, err
 		return nil, err
 	}
 
-	var userResponses _remote0addr
-	// user join get all respone username
-	var userResponses []dto.UserResponsew
+	var userResponses []dto.UserResponse
 	for _, user := range users {
 		userResponses = append(userResponses, *s.toUserResponse(&user))
 	}

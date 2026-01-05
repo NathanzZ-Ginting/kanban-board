@@ -1,132 +1,147 @@
-# 🎯 Kanban Board - Monorepo
+# 🎯 Kanban Board
 
-Modern Kanban Board application built with Next.js (Frontend) and Golang Microservices (Backend).
-
-> **� Cara run aplikasi: [RUN.md](./RUN.md)**
-
-## Tech Stack
-
-### Frontend
-- **Framework**: Next.js 14+ (App Router)
-- **Language**: TypeScript
-- **State Management**: Zustand
-- **UI Framework**: Tailwind CSS + shadcn/ui
-- **HTTP Client**: Axios
-- **Architecture**: Component-based with Atomic Design
-
-### Backend
-- **Language**: Golang 1.21+
-- **Architecture**: Clean Architecture + Microservices
-- **Database**: MongoDB
-- **Pattern**: Repository Pattern
-- **API**: REST API with JSON
-
-### Infrastructure
-- **Database**: MySQL 8.0+
-- **Cache**: Redis 7+
+Kanban Board dengan Next.js & Golang Microservices + Supabase.
 
 ## 🚀 Quick Start
 
-### Manual Setup
-```bash
-# Clone repository
-git clone https://github.com/NathanzZ-Ginting/kanban-board.git
-cd kanban-monorepo
+### 1. Setup Supabase
+1. Buat project di [supabase.com](https://supabase.com)
+2. Copy connection string dari Settings > Database
 
-# Setup services
-chmod +x start.sh
-./start.sh
-```
-
-See complete guide at [SETUP_GUIDE.md](./SETUP_GUIDE.md)
-
-### Access Application
-- **Frontend**: http://localhost:3000
-- **Auth Service**: http://localhost:8001
-- **User Service**: http://localhost:8002
-- **Board Service**: http://localhost:8003
-- **Task Service**: http://localhost:8004
-
-## 📚 Documentation
-- **Setup Guide**: [SETUP_GUIDE.md](./SETUP_GUIDE.md) - Panduan lengkap setup & running
-- **API Documentation**: Coming soon
-- **Architecture**: Coming soon
-
-## Project Structure
-
-```
-kanban-monorepo/
-├── frontend/                 # Next.js application
-├── backend/                  # Golang microservices
-│   ├── auth-service/
-│   ├── user-service/
-│   ├── board-service/
-│   └── task-service/
-├── docs/                     # Documentation
-└── scripts/                  # Utility scripts
-```
-
-## 🔧 Commands Cheatsheet
-
-```bash
-# Development
-cd frontend && npm run dev        # Run frontend
-cd backend/auth-service && go run cmd/main.go  # Run auth service
-
-# Database
-mysql -u kanban_user -p  # Access MySQL
-```
-
-Untuk command lengkap, lihat [SETUP_GUIDE.md](./SETUP_GUIDE.md)
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- Go 1.21+
-- MySQL 8.0+
-
-### Quick Start
-
-Ikuti langkah di [SETUP_GUIDE.md](./SETUP_GUIDE.md) untuk:
-- ✅ Setup manual
-- ✅ Environment variables
-- ✅ Troubleshooting
-- ✅ API endpoints
-
-## Environment Variables
-
-Buat file `.env` di root directory. Lihat detail lengkap di [SETUP_GUIDE.md](./SETUP_GUIDE.md#environment-variables)
-
+### 2. Environment Variables
+Buat file `.env`:
 ```env
 JWT_SECRET=your-secret-key
 JWT_EXPIRY=24h
-MYSQL_HOST=mysql
-MYSQL_USER=kanban_user
-MYSQL_PASSWORD=kanban_pass
-MYSQL_DATABASE=kanban_db
+SUPABASE_DB_HOST=your-project.supabase.co
+SUPABASE_DB_PORT=5432
+SUPABASE_DB_USER=postgres
+SUPABASE_DB_PASSWORD=your-password
+SUPABASE_DB_NAME=postgres
 ```
 
-## 🏗️ Architecture
+### 3. Run Services
 
-### Backend Services
-- **Auth Service** (Port 8001): Authentication & authorization
-- **User Service** (Port 8002): User management
-- **Board Service** (Port 8003): Board/project management
-- **Task Service** (Port 8004): Task management
+**Option 1: Manual (Recommended for Development)**
+```bash
+# Terminal 1 - Auth Service
+cd backend/auth-service && go run cmd/main.go    # :8001
 
-### API Documentation
-- Swagger UI available at: `http://localhost:8080/swagger`
-- Detail API endpoints di [SETUP_GUIDE.md](./SETUP_GUIDE.md#api-endpoints)
+# Terminal 2 - User Service  
+cd backend/user-service && go run cmd/main.go    # :8002
 
-## 🤝 Contributing
+# Terminal 3 - Board Service
+cd backend/board-service && go run cmd/main.go   # :8003
 
-Contributions are welcome! Please read our contributing guidelines.
+# Terminal 4 - Task Service
+cd backend/task-service && go run cmd/main.go    # :8004
 
-## 📄 License
+# Terminal 5 - Frontend
+cd frontend && npm install && npm run dev         # :3000
+```
 
-MIT License - see LICENSE file for details.
+**Option 2: Using start script (Background)**
+```bash
+./start.sh  # Start all backend services in background
+cd frontend && npm run dev  # Start frontend
+```
+
+### 4. Access
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:8001-8004
+
+**First Time Setup:**
+1. Register akun baru di http://localhost:3000/register
+2. Login dengan akun yang baru dibuat
+3. Create board dan mulai menggunakan aplikasi
+
+**Jika ada masalah:**
+```bash
+./fix-issues.sh  # Tool untuk diagnosa dan fix masalah umum
+```
+
+## 🛠️ Tech Stack
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Zustand
+- **Backend**: Golang 1.21+, Clean Architecture
+- **Database**: Supabase (PostgreSQL)
+
+## 🔧 Troubleshooting
+
+### Error: "prepared statement already exists (SQLSTATE 42P05)"
+✅ **Fixed!** Prepared statements sudah dinonaktifkan di semua services.
+
+Jika masih terjadi, restart services:
+```bash
+# Stop all services
+pkill -f "go run cmd/main.go"
+
+# Start again manually atau dengan ./start.sh
+```
+
+### Error: "relation already exists (SQLSTATE 42P07)"
+✅ **Fixed!** Services sekarang akan skip migration error yang tidak critical.
+
+### Error: "Failed to load board data" di Frontend
+
+**Penyebab umum:**
+1. **Token expired atau invalid** - Login ulang
+2. **Backend service belum running** - Pastikan semua services running
+3. **CORS issues** - Check browser console
+
+**Cara debug:**
+1. Buka browser DevTools (F12) → Console tab
+2. Cari error messages:
+   - "No access token found" → Login ulang
+   - "401 Unauthorized" → Token expired, login ulang
+   - "404 Not Found" → Board ID tidak valid
+
+**Solusi:**
+```bash
+# 1. Logout dan login ulang di frontend
+# 2. Check localStorage di browser DevTools:
+#    - Application → Local Storage → http://localhost:3000
+#    - Cari 'accessToken' dan 'refreshToken'
+
+# 3. Test API manually:
+./test-api.sh
+
+# 4. Jika perlu, register user baru:
+curl -X POST http://localhost:8001/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@test.com",
+    "username": "testuser",
+    "password": "test12345",
+    "firstName": "Test",
+    "lastName": "User"
+  }'
+```
+
+### Restart Single Service
+```bash
+# Stop service (Ctrl+C di terminal yang menjalankan service)
+# Lalu run ulang:
+cd backend/board-service && go run cmd/main.go
+```
+
+### Clean Database (Reset semua tabel)
+Jika ingin reset database, hapus semua tabel di Supabase Dashboard atau gunakan SQL:
+```sql
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+```
+
+### Check Services Status
+```bash
+# Check if services are running
+ps aux | grep "go run cmd/main.go"
+
+# Test health endpoints
+curl http://localhost:8001/health  # Auth Service
+curl http://localhost:8002/health  # User Service
+curl http://localhost:8003/health  # Board Service
+curl http://localhost:8004/health  # Task Service
+```
 
 ---
-
 Made with ❤️ by Nathan Ginting

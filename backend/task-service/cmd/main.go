@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,17 +26,21 @@ func main() {
 
 	log := logger.NewLogger(cfg.Environment)
 
-	db, err := database.NewMySQLDatabase(cfg)
+	db, err := database.NewPostgresDatabase(cfg)
 	if err != nil {
 		log.Fatal("Failed to connect to database", "error", err)
 	}
 	defer db.Close()
 
 	if err := db.AutoMigrate(); err != nil {
-		log.Fatal("Failed to run database migrations", "error", err)
+		// Check if error is "relation already exists" which is not critical
+		if !strings.Contains(err.Error(), "already exists") {
+			log.Fatal("Failed to run database migrations", "error", err)
+		}
+		log.Warn("Database tables already exist, skipping migration", "error", err)
 	}
 
-	log.Info("Connected to MySQL and migrations completed")
+	log.Info("Connected to Supabase PostgreSQL and migrations completed")
 
 	taskRepo := repository.NewTaskRepository(db.GetDB())
 	commentRepo := repository.NewCommentRepository(db.GetDB())
